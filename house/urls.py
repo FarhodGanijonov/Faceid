@@ -3,7 +3,7 @@ from .views import (
     HouseListView, HouseDetailView, HouseCreateView,
     HouseUpdateView, HouseDeleteView, HouseImageDeleteView, HousePublicListView, MyDeactiveHouseListView,
     HousePendingListView, ResendToAdminView, RegionListAPIView, RegionDetailWithDistrictsAPIView, ToggleSaveHouseAPIView,
-    SavedHouseListAPIView
+    SavedHouseListAPIView, CommentCreateAPIView
 )
 
 urlpatterns = [
@@ -13,6 +13,8 @@ urlpatterns = [
     path('house-images/delete/<int:id>/', HouseImageDeleteView.as_view()),
     path('houses/<int:pk>/edit/', HouseUpdateView.as_view()),
     path('houses/<int:pk>/delete/', HouseDeleteView.as_view()),
+    path('houses/comments/', CommentCreateAPIView.as_view(), name='house-comments'),
+
 
 
     path('houses/active/', HousePublicListView.as_view(), name='public-houses'),

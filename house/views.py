@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import get_object_or_404
 from .models import House, Region, District
 from .permission import IsOwner, IsFaceVerified
-from .serializers import HouseSerializer, RegionSerializer, DistrictSerializer
+from .serializers import HouseSerializer, RegionSerializer, DistrictSerializer, CommentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -229,3 +229,24 @@ class SavedHouseListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.saved_houses.filter(is_active=True, status='active')
+
+
+class CommentCreateAPIView(APIView):
+
+    def post(self, request):
+        house_id = request.data.get('house')
+        if not house_id:
+            return Response({"error": "Id X ga tegishli uy topilmadi "}, status=status.HTTP_400_BAD_REQUEST)
+
+        # house mavjudligini tekshirish
+        house = get_object_or_404(House, id=house_id)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            # user va house ni save qilish
+            serializer.save(user=request.user, house=house)
+            return Response(
+                {"message": "Admin so‘rovingiz yubordi ✅"},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

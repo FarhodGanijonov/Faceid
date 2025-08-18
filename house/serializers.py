@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import House, House_image, Region, District
+from .models import House, House_image, Region, District, Comment
 
 
 class DistrictSerializer(serializers.ModelSerializer):
@@ -54,3 +54,21 @@ class HouseSerializer(serializers.ModelSerializer):
             House_image.objects.create(house=house, image=image)
 
         return house
+
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    house_id = serializers.IntegerField(write_only=True)  # faqat post uchun
+    house = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'house_id', 'house', 'user', 'text', 'created_at']
+        read_only_fields = ['id', 'user', 'created_at']
+
+        def validate_house(self, value):
+            if not House.objects.filter(id=value.id).exists():
+                raise serializers.ValidationError("Bunday uy mavjud emas.")
+            return value
