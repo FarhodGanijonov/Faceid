@@ -232,6 +232,7 @@ class SavedHouseListAPIView(generics.ListAPIView):
 
 
 class CommentCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         house_id = request.data.get('house')

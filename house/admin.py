@@ -87,6 +87,7 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ("house__title", "user__full_name", "user__phone")
     list_filter = ("created_at", "house__title")
     ordering = ("-created_at",)
+    list_select_related = ("house", "house__owner", "user")  # SQL querylarni kamaytiradi
 
     def house_title(self, obj):
         return obj.house.title

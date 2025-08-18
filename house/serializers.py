@@ -56,8 +56,6 @@ class HouseSerializer(serializers.ModelSerializer):
         return house
 
 
-
-
 class CommentSerializer(serializers.ModelSerializer):
     house_id = serializers.IntegerField(write_only=True)  # faqat post uchun
     house = serializers.SerializerMethodField(read_only=True)
@@ -68,7 +66,13 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'house_id', 'house', 'user', 'text', 'created_at']
         read_only_fields = ['id', 'user', 'created_at']
 
-        def validate_house(self, value):
-            if not House.objects.filter(id=value.id).exists():
-                raise serializers.ValidationError("Bunday uy mavjud emas.")
-            return value
+    def get_house(self, obj):
+        return obj.house.id  # yoki HouseSerializer orqali batafsil
+
+    def get_user(self, obj):
+        return obj.user.fullname  # yoki obj.user.id
+
+    def validate_house_id(self, value):  # <-- shu yerda to‘g‘ri
+        if not House.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Bunday uy mavjud emas.")
+        return value
