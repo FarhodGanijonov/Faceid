@@ -235,19 +235,11 @@ class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        house_id = request.data.get('house')
-        if not house_id:
-            return Response({"error": "Id X ga tegishli uy topilmadi "}, status=status.HTTP_400_BAD_REQUEST)
-
-        # house mavjudligini tekshirish
-        house = get_object_or_404(House, id=house_id)
-
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
-            # user va house ni save qilish
-            serializer.save(user=request.user, house=house)
+            serializer.save(user=request.user)
             return Response(
-                {"message": "Admin so‘rovingiz yubordi ✅"},
+                {"message": "Adminga yuborildi ✅"},
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

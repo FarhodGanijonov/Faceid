@@ -81,7 +81,7 @@ class CommentAdmin(admin.ModelAdmin):
         "house_owner_phone",
         "comment_user_name",
         "comment_user_phone",
-        "text",
+        "is_active_with_text",
         "created_at",
     )
     search_fields = ("house__title", "user__full_name", "user__phone")
@@ -108,6 +108,15 @@ class CommentAdmin(admin.ModelAdmin):
     def comment_user_phone(self, obj):
         return obj.user.phone if hasattr(obj.user, "phone") else "—"
     comment_user_phone.short_description = "Comment User Phone"
+
+    def is_active_with_text(self, obj):
+        if obj.is_active:
+            return format_html('✅ O‘qildi')
+        else:
+            return format_html('❌ O‘qilmadi')
+
+    is_active_with_text.short_description = "Holat"
+    is_active_with_text.admin_order_field = "is_active"
 
 
 admin.site.register(Comment, CommentAdmin)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import House, House_image, Region, District, Comment
+from django.shortcuts import get_object_or_404
 
 
 class DistrictSerializer(serializers.ModelSerializer):
@@ -57,7 +58,7 @@ class HouseSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    house_id = serializers.IntegerField(write_only=True)  # faqat post uchun
+    house_id = serializers.IntegerField(write_only=True)
     house = serializers.SerializerMethodField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
 
@@ -67,12 +68,26 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'created_at']
 
     def get_house(self, obj):
-        return obj.house.id  # yoki HouseSerializer orqali batafsil
+        if obj.house:
+            return {"id": obj.house.id, "title": obj.house.title}
+        return None
 
     def get_user(self, obj):
-        return obj.user.fullname  # yoki obj.user.id
+        if obj.user:
+            return {
+                "id": obj.user.id,
+                "fullname": obj.user.fullname,
+                "phone": getattr(obj.user, "phone", None)
+            }
+        return None
 
-    def validate_house_id(self, value):  # <-- shu yerda to‘g‘ri
+    def validate_house_id(self, value):
         if not House.objects.filter(id=value).exists():
             raise serializers.ValidationError("Bunday uy mavjud emas.")
         return value
+
+    def create(self, validated_data):
+        house_id = validated_data.pop('house_id')
+        house = get_object_or_404(House, id=house_id)
+        comment = Comment.objects.create(**validated_data, house=house)
+        return comment

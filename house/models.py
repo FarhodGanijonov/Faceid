@@ -57,11 +57,11 @@ class Comment(models.Model):
     house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Comment by {self.user} on {self.house.title}"
-
 
 
 class House_image(models.Model):
